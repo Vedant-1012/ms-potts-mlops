@@ -85,3 +85,23 @@ There’s still ongoing work on:
 - Possible DVC integration for data and index versioning
 
 ---
+## 9. Findings, Challenges, and Areas for Improvement
+
+### *Findings*
+- The overall architecture of the system is functioning well in a modular fashion—retriever, generator, and query handler are independently testable.
+- Using sentence-transformers with FAISS provided fast and reasonably accurate document retrieval for most queries.
+- Gemini API responses were more grounded and specific when paired with relevant retrieved chunks, confirming the benefit of the RAG approach.
+- Manual intent examples worked decently for basic similarity-based intent classification, but lack robustness for edge cases.
+
+### *Challenges Encountered*
+- One of the biggest challenges was handling queries with vague or multiple intents. The current method using embedding similarity is limited and sometimes misclassifies user intent.
+- Creating a high-quality nutrition dataset was time-consuming. Some data had to be written manually or scraped from unstructured sources.
+- It's still unclear how to properly evaluate the factuality and helpfulness of generated responses, since we don’t have a gold-standard reference for each query.
+- Integrating the Gemini API came with rate-limiting issues during testing, making batch testing difficult.
+
+### *Areas for Improvement*
+- Replace or augment current intent classification with a lightweight supervised model or a rules-based fallback.
+- Expand and diversify the dataset with real-world user queries and responses.
+- Develop a small evaluation framework (precision/recall on intent matching, manual QA grading for output).
+- Integrate DVC for data and index versioning to improve reproducibility across pipeline runs.
+- Possibly create a user interface to test different input scenarios more easily.
