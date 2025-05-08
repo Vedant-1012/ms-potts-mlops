@@ -1,0 +1,8 @@
+fastapi
+gradio
+requests
+sentence-transformers
+google-generativeai
+uvicorn
+pydantic
+python-dotenv
