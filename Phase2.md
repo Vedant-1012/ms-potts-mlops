@@ -54,6 +54,8 @@ Monitoring metrics include:
 - Model performance (latency, token count)
 - Application metrics (request processing time, endpoint usage)
 
+![System Monitoring Visualization](images/Monitoring-Result.png)
+
 ### 3. Profiling & Optimization
 For Profiling details and Results, [click here](./README-PROFILING.md).
 
@@ -79,6 +81,8 @@ with code_profiler.profile_block("similarity_search"):
 Profiling results are saved to:
 - `./profiling_results/` for Python code profiling
 - `./ml_profiling_results/` for ML model profiling
+
+![Profiling Result](images/Profiling-Result.png)
 
 ### 4. Experiment Tracking with MLflow
 For Profiling details and Results, [click here](./README-EXPERIMENT_TRACKING.md).
