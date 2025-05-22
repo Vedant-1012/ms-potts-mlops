@@ -2,6 +2,10 @@
 
 import gradio as gr
 import requests
+import os
+import google.generativeai as genai
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Global profile storage
 user_profile = {}
@@ -62,7 +66,7 @@ def chat_page():
         }
         try:
             # Send POST to localhost:8001/query
-            response = requests.post("http://localhost:8080/query", json=payload)
+            response = requests.post("http://backend:8080/query", json=payload)
             response_json = response.json()
 
             final_answer = response_json.get("final_answer", "No answer received.")

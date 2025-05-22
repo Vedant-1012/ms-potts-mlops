@@ -4,6 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from model_gemini import GeminiModel
 import os
 from dotenv import load_dotenv
+from utils.monitoring import ModelMonitor
+
+
+# Initialize monitoring
+monitor = ModelMonitor(metrics_dir="./metrics")
+monitor.start_monitoring(interval=5)  # Check system metrics every 5 seconds
+
 
 # Load environment variables from .env locally
 load_dotenv()

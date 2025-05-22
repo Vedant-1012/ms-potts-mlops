@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: ms-potts-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - potts-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: ms-potts-frontend
+    ports:
+      - "7860:7860"
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    networks:
+      - potts-net
+
+networks:
+  potts-net:
+    driver: bridge
