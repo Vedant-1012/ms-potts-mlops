@@ -1,27 +1,3 @@
-# Ms. Potts - AI-powered Nutrition Assistant 🥗
-
-Ms. Potts is an AI-powered nutrition chatbot that provides meal recommendations, dietary advice, and meal logging, personalized based on user profile information. This project follows MLOps best practices with comprehensive monitoring, experiment tracking, and configuration management.
-
-## Features
-
-- Retrieval-Augmented Generation (RAG) Pipeline
-- Intent Classification
-- Personalized Meal Planning
-- Meal Logging
-- Gemini API Integration
-- MLOps Best Practices (Phase 2)
-
-## Tech Stack
-
-- FastAPI (Backend API)
-- Gradio (Frontend UI)
-- Sentence-Transformers
-- Google Gemini API
-- Docker Containerization with Docker Compose
-- MLflow Experiment Tracking
-- Hydra Configuration Management
-- Enhanced Logging and Monitoring
-
 ## Phase 2 MLOps Enhancements
 
 ### 1. Containerization with Docker
