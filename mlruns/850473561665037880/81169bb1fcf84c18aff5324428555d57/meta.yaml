@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/vedantthakkar/Desktop/MLOPs/ms-potts-mlops/mlruns/850473561665037880/81169bb1fcf84c18aff5324428555d57/artifacts
+end_time: 1747892162612
+entry_point_name: ''
+experiment_id: '850473561665037880'
+lifecycle_stage: active
+run_id: 81169bb1fcf84c18aff5324428555d57
+run_name: example_run
+run_uuid: 81169bb1fcf84c18aff5324428555d57
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747892162603
+status: 3
+tags: []
+user_id: vedantthakkar
