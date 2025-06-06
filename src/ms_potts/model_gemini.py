@@ -2,15 +2,16 @@ import json
 import time
 import logging
 import google.generativeai as genai
-from retriever_who import WHOBookRetriever
-from potts import IntentClassifier
-from tools import meal_logging, meal_planning
+
+# from retriever_who import WHOBookRetriever
+from ms_potts.retriever_who import WHOBookRetriever
+from ms_potts.potts import IntentClassifier
+from ms_potts.tools import meal_logging, meal_planning
 from dotenv import load_dotenv
 import os
 
-from utils.experiment_tracking import ExperimentTracker
-from utils.monitoring import ModelMonitor  # ✅ import monitor
-from utils.debugging import DebugTracer, debug_value, exception_handler
+from ms_potts.utils.monitoring import ModelMonitor  # ✅ import monitor
+from ms_potts.utils.debugging import DebugTracer, debug_value
 
 tracer = DebugTracer(output_dir="./debug_traces")
 # Load environment variables
@@ -20,6 +21,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class GeminiModel:
     def __init__(self):
         try:
@@ -28,8 +30,8 @@ class GeminiModel:
             # ✅ Initialize monitoring
             self.monitor = ModelMonitor(metrics_dir="./metrics")
 
-            if hasattr(genai, 'GenerativeModel'):
-                self.model = genai.GenerativeModel('gemini-1.5-flash')
+            if hasattr(genai, "GenerativeModel"):
+                self.model = genai.GenerativeModel("gemini-1.5-flash")
                 self.use_new_api = True
             else:
                 self.model = None
@@ -41,7 +43,7 @@ class GeminiModel:
         except Exception as e:
             logger.error(f"Initialization error: {e}")
             raise
-    
+
     @tracer.trace_function
     def get_response(self, query: str, user_context: dict = None) -> dict:
         if not query or not query.strip():
@@ -49,16 +51,18 @@ class GeminiModel:
                 "reasoning": "No valid query provided.",
                 "final_answer": "Please provide a valid query.",
                 "detected_intent": None,
-                "context_used": ""
+                "context_used": "",
             }
 
         try:
             query_embedding = self.retriever.embed_query(query)
             debug_value(query_embedding.shape, "Query embedding shape")
 
-            intent_result = self.intent_classifier.classify_from_embedding(query_embedding)
-    
-            top_intent = intent_result['top_intent']
+            intent_result = self.intent_classifier.classify_from_embedding(
+                query_embedding
+            )
+
+            top_intent = intent_result["top_intent"]
             debug_value(top_intent, "Detected intent")
 
             context = self.retriever.retrieve(query)
@@ -66,10 +70,12 @@ class GeminiModel:
 
             if "OUT_OF_SCOPE" in context:
                 return {
-                    "reasoning": context.replace("OUT_OF_SCOPE:", "Query out of scope."),
+                    "reasoning": context.replace(
+                        "OUT_OF_SCOPE:", "Query out of scope."
+                    ),
                     "final_answer": "This question is outside my nutrition expertise.",
                     "detected_intent": top_intent,
-                    "context_used": context
+                    "context_used": context,
                 }
 
             if top_intent == "Meal-Logging":
@@ -77,7 +83,9 @@ class GeminiModel:
             elif top_intent == "Meal-Planning-Recipes":
                 return meal_planning(user_context)
             else:
-                user_profile_str = f"User Profile: {json.dumps(user_context)}" if user_context else ""
+                user_profile_str = (
+                    f"User Profile: {json.dumps(user_context)}" if user_context else ""
+                )
                 full_prompt = f"""
                 You are a helpful and expert nutrition assistant.
                 Use the following context to answer the user's question:
@@ -105,12 +113,14 @@ class GeminiModel:
                         model="gemini-1.5-flash",
                         prompt=full_prompt,
                         temperature=0.2,
-                        max_output_tokens=1024
+                        max_output_tokens=1024,
                     )
                     if response and response.result:
                         response_text = response.result.strip()
                     else:
-                        response_text = "Sorry, I couldn't generate a response right now."
+                        response_text = (
+                            "Sorry, I couldn't generate a response right now."
+                        )
                         logger.error("⚠️ Gemini API returned empty result.")
 
                 # ✅ End timer
@@ -121,11 +131,9 @@ class GeminiModel:
                 debug_value(tokens_generated, "Generated token count")
 
                 # ✅ Log model metrics
-                self.monitor.log_model_metrics({
-                    "latency_ms": latency_ms,
-                    "tokens_generated": tokens_generated
-                })
-
+                self.monitor.log_model_metrics(
+                    {"latency_ms": latency_ms, "tokens_generated": tokens_generated}
+                )
 
                 # ✅ Save debug trace
                 tracer.save_trace(f"query_trace_{int(time.time())}.json")
@@ -134,18 +142,21 @@ class GeminiModel:
                     "reasoning": f"Used Gemini with intent: {top_intent}",
                     "final_answer": response_text,
                     "detected_intent": top_intent,
-                    "context_used": context
+                    "context_used": context,
                 }
 
         except Exception as e:
             logger.error(f"GeminiModel error: {e}")
-            tracer.save_trace(f"error_trace_{int(time.time())}.json")  # SAVE TRACE HERE TOO
+            tracer.save_trace(
+                f"error_trace_{int(time.time())}.json"
+            )  # SAVE TRACE HERE TOO
             return {
                 "reasoning": f"Error occurred: {str(e)}",
                 "final_answer": "Sorry, something went wrong.",
                 "detected_intent": None,
-                "context_used": ""
+                "context_used": "",
             }
+
     # @tracer.trace_function
     # def get_response(self, query: str, user_context: dict = None) -> dict:
     #     if not query or not query.strip():

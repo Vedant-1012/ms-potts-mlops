@@ -12,8 +12,11 @@ user_profile = {}
 
 # ------------------- Gradio App -------------------
 
+
 def profile_page(profile, chat):
-    gr.Markdown("## 🧑‍⚕️ Welcome to Ms. Potts — Your AI Nutrition Assistant\nPlease complete your profile to get started.")
+    gr.Markdown(
+        "## 🧑‍⚕️ Welcome to Ms. Potts — Your AI Nutrition Assistant\nPlease complete your profile to get started."
+    )
 
     with gr.Row():
         name = gr.Textbox(label="Name")
@@ -24,7 +27,9 @@ def profile_page(profile, chat):
         height = gr.Number(label="Height (cm)")
         weight = gr.Number(label="Weight (kg)")
 
-    activity_level = gr.Dropdown(choices=["sedentary", "moderate", "active"], label="Activity Level")
+    activity_level = gr.Dropdown(
+        choices=["sedentary", "moderate", "active"], label="Activity Level"
+    )
     allergies = gr.Textbox(label="Allergies (comma-separated)")
 
     save_btn = gr.Button("Save Profile & Start Chatting")
@@ -47,23 +52,19 @@ def profile_page(profile, chat):
     save_btn.click(
         save_profile,
         inputs=[name, age, sex, height, weight, activity_level, allergies],
-        outputs=[profile, chat, status]
+        outputs=[profile, chat, status],
     )
 
+
 def chat_page():
-    gr.Markdown(f"## 💬 Chat with Ms. Potts — Personalized Nutrition Guidance")
+    gr.Markdown("## 💬 Chat with Ms. Potts — Personalized Nutrition Guidance")
 
     chatbot = gr.Chatbot()
     query_input = gr.Textbox(placeholder="Ask about food, diet, meal plans...")
     send_btn = gr.Button("Send")
 
     def ask_potts(query, history):
-        payload = {
-            "query": query,
-            "context": {
-                "user_profile": user_profile
-            }
-        }
+        payload = {"query": query, "context": {"user_profile": user_profile}}
         try:
             # Send POST to localhost:8001/query
             response = requests.post("http://backend:8080/query", json=payload)
@@ -79,23 +80,26 @@ def chat_page():
             else:
                 personalized_answer = f"Hi {user_name}, {final_answer}"
 
-            history.append((query, personalized_answer + f"\n\n📌 Intent: {intent}\n🧠 Reasoning: {reasoning}"))
+            history.append(
+                (
+                    query,
+                    personalized_answer
+                    + f"\n\n📌 Intent: {intent}\n🧠 Reasoning: {reasoning}",
+                )
+            )
             return history, ""
         except Exception as e:
             history.append((query, f"❌ Error: {str(e)}"))
             return history, ""
 
     send_btn.click(
-        ask_potts,
-        inputs=[query_input, chatbot],
-        outputs=[chatbot, query_input]
+        ask_potts, inputs=[query_input, chatbot], outputs=[chatbot, query_input]
     )
 
     query_input.submit(
-        ask_potts,
-        inputs=[query_input, chatbot],
-        outputs=[chatbot, query_input]
+        ask_potts, inputs=[query_input, chatbot], outputs=[chatbot, query_input]
     )
+
 
 # Build Gradio App
 with gr.Blocks() as gradio_app:

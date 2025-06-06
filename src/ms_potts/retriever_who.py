@@ -42,23 +42,26 @@ import os
 from sentence_transformers import SentenceTransformer
 
 # ✅ Import profilers
-from utils.profiling import CodeProfiler, MLProfiler
+from ms_potts.utils.profiling import CodeProfiler, MLProfiler
 
 # ✅ Initialize profilers
 code_profiler = CodeProfiler(output_dir="./profiling_results")
 ml_profiler = MLProfiler(output_dir="./ml_profiling_results")
 
+
 class WHOBookRetriever:
     def __init__(self):
-        self.embed_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        self.embed_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-        path = os.path.join(os.path.dirname(__file__), 'data', 'who_embeddings.csv')
+        path = os.path.join(os.path.dirname(__file__), "data", "who_embeddings.csv")
         self.df = pd.read_csv(path)
 
         self.embeddings = np.array(
-            self.df['embedding'].apply(lambda x: np.array(eval(x), dtype=np.float32)).tolist()
+            self.df["embedding"]
+            .apply(lambda x: np.array(eval(x), dtype=np.float32))
+            .tolist()
         )
-        self.text_chunks = self.df['sentence_chunk'].tolist()
+        self.text_chunks = self.df["sentence_chunk"].tolist()
 
     @code_profiler.profile_function  # ✅ Profile the embedding function
     def embed_query(self, query: str) -> np.ndarray:

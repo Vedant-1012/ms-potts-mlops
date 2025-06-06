@@ -3,8 +3,8 @@
 
 ## 1. Overview
 
-**Tool Used:** [MLflow](https://mlflow.org/)  
-**Tracking URI:** `http://localhost:5000` (local MLflow UI)  
+**Tool Used:** [MLflow](https://mlflow.org/)
+**Tracking URI:** `http://localhost:5000` (local MLflow UI)
 **Experiment Name:** `ms_potts_nutrition`
 
 MLflow was integrated into the Ms. Potts project to track key experiment data including:

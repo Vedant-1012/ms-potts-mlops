@@ -65,8 +65,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from model_gemini import GeminiModel
-import os
+from ms_potts.model_gemini import GeminiModel
 from dotenv import load_dotenv
 from utils.monitoring import ModelMonitor
 from utils.enhanced_logging import EnhancedLogger, log_with_context
@@ -84,7 +83,7 @@ enhanced_logger = EnhancedLogger(
     console_output=True,
     file_output=True,
     json_output=True,
-    rich_formatting=True
+    rich_formatting=True,
 )
 logger = enhanced_logger.get_logger()
 
@@ -104,14 +103,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Health check
 @app.get("/")
 def health_check():
     logger.info("Health check endpoint called")
     return {"status": "Ms. Potts backend is live!"}
 
+
 # Initialize GeminiModel
 model = GeminiModel()
+
 
 @app.post("/query")
 async def query_endpoint(request: Request):
@@ -128,7 +130,7 @@ async def query_endpoint(request: Request):
             "Received query",
             request_id=request_id,
             query=query,
-            user_context_keys=list(user_context.keys()) if user_context else []
+            user_context_keys=list(user_context.keys()) if user_context else [],
         )
 
         response = model.get_response(query, user_context)
@@ -141,20 +143,24 @@ async def query_endpoint(request: Request):
             request_id=request_id,
             response_time_ms=duration_ms,
             intent=response.get("detected_intent"),
-            response_length=len(response.get("final_answer", ""))
+            response_length=len(response.get("final_answer", "")),
         )
 
-        return JSONResponse({
-            "final_answer": response.get("final_answer", ""),
-            "detected_intent": response.get("detected_intent", ""),
-            "reasoning": response.get("reasoning", ""),
-        })
+        return JSONResponse(
+            {
+                "final_answer": response.get("final_answer", ""),
+                "detected_intent": response.get("detected_intent", ""),
+                "reasoning": response.get("reasoning", ""),
+            }
+        )
 
     except Exception as e:
         logger.exception("Exception inside /query")
         return JSONResponse({"error": str(e)}, status_code=500)
 
+
 # Uncomment to run locally
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)

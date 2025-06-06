@@ -1,7 +1,7 @@
 
 # Phase 1: Project Design and Model Development
 
-**Project Title**: Ms. Potts: A Nutrition Assistant Using Retrieval-Augmented Generation  
+**Project Title**: Ms. Potts: A Nutrition Assistant Using Retrieval-Augmented Generation
 **Date**: 2025-05-06
 
 ---

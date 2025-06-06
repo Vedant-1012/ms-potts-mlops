@@ -24,8 +24,6 @@ var/
 *.egg
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -87,3 +85,13 @@ target/
 
 # Mypy cache
 .mypy_cache/
+
+# ✅ Project-specific additions
+mlruns/
+mlruns.db
+.pytest_cache/
+.ruff_cache/
+debug_traces/
+experiment_tracking.log
+*.prof
+*.tmp

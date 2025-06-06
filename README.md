@@ -45,7 +45,7 @@ The Dockerfiles include:
 
 ### 2. Monitoring & Debugging
 
-📊 **Monitoring & Debugging Documentation**  
+📊 **Monitoring & Debugging Documentation**
 For setup, examples, and troubleshooting guides, [click here](./README-MONITORING-DEBUGGING.md).
 
 Comprehensive monitoring and debugging tools have been integrated:

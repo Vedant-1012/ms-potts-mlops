@@ -1,5 +1,6 @@
 # tools.py
 
+
 def meal_logging(query, user_context):
     """Simulate extracting and logging meal information."""
     # In real version, you would parse the query with LLM.
@@ -8,14 +9,19 @@ def meal_logging(query, user_context):
         "reasoning": f"Logged meal based on user input: '{query}'.",
         "final_answer": f"Meal '{query}' successfully logged for user {user_context.get('name', 'Unknown')}.",
         "detected_intent": "Meal-Logging",
-        "context_used": "User meal logging simulation."
+        "context_used": "User meal logging simulation.",
     }
+
 
 def meal_planning(user_context):
     """Simulate generating a simple meal plan."""
-    goal = user_context.get('goal', 'healthy eating')
-    allergies = user_context.get('allergies', '')
-    diet_restrictions = f"Avoid these ingredients: {allergies}" if allergies else "No specific restrictions."
+    goal = user_context.get("goal", "healthy eating")
+    allergies = user_context.get("allergies", "")
+    diet_restrictions = (
+        f"Avoid these ingredients: {allergies}"
+        if allergies
+        else "No specific restrictions."
+    )
 
     plan = f"""
     Here is a basic 3-day meal plan for your goal: {goal}.

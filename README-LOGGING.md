@@ -6,7 +6,7 @@ Ms. Potts uses an advanced logging system powered by a custom `EnhancedLogger` f
 
 ## ✅ Logger: EnhancedLogger
 
-**Location**: `utils/enhanced_logging.py`  
+**Location**: `utils/enhanced_logging.py`
 **Used In**: `main.py`, `GeminiModel`, and FastAPI endpoints
 
 ### Features:
