@@ -120,7 +120,7 @@ orjson==3.10.1
 packaging==23.2
 pandas==2.2.2
 pathspec==0.12.1
-pillow==10.2.0
+pillow==10.1.0
 pluggy>=1.5,<2.0
 pre_commit==3.7.0
 prompt_toolkit==3.0.43
