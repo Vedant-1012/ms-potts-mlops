@@ -46,15 +46,22 @@ jobs:
       - name: Configure Docker to talk to Artifact Registry
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build & push backend image
         run: |
-          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest -f Dockerfile.backend .
-          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest
+          docker buildx build . \
+            -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest \
+            -f Dockerfile.backend \
+            --push
 
       - name: Build & push frontend image
         run: |
-          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest -f Dockerfile.frontend .
-          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest
+          docker buildx build . \
+            -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest \
+            -f Dockerfile.frontend \
+            --push
 
       - name: Deploy backend to Cloud Run
         run: |
