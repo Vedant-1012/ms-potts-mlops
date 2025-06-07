@@ -125,4 +125,5 @@ jobs:
             --image us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest \
             --platform managed \
             --region us-central1 \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
