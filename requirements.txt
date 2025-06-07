@@ -17,11 +17,5 @@ orjson
 protobuf
 typing_extensions
 tqdm
-
-# Dev tools
-pytest
-pytest-cov
-ruff
-pre_commit
-setuptools
-wheel
+mlflow
+google-generativeai

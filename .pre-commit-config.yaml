@@ -3,13 +3,15 @@ repos:
     rev: 23.7.0
     hooks:
       - id: black
-        language_version: python3
+        name: Black Formatter
+        language_version: python3  # ✅ Matches your env
         additional_dependencies: []
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.4.1
     hooks:
       - id: ruff
+        name: Ruff Linter
         language_version: python3
         additional_dependencies: []
 
@@ -17,6 +19,9 @@ repos:
     rev: v4.5.0
     hooks:
       - id: end-of-file-fixer
+        name: Fix End of File
         language_version: python3
+
       - id: trailing-whitespace
+        name: Remove Trailing Whitespace
         language_version: python3
