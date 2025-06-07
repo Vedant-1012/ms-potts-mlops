@@ -31,5 +31,7 @@ RUN mkdir -p data/raw data/processed data/interim data/external \
     models \
     reports/figures
 
+# Expose the port for Gradio
+EXPOSE 8080
 # Run Gradio frontend by default
 CMD ["python", "src/ms_potts/interface.py"]

@@ -113,4 +113,4 @@ with gr.Blocks() as gradio_app:
 
 # Launch Gradio App
 if __name__ == "__main__":
-    gradio_app.launch(server_name="0.0.0.0", server_port=7860)
+    gradio_app.launch(server_name="0.0.0.0", server_port=8080)

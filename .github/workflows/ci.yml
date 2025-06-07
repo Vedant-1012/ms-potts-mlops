@@ -25,10 +25,6 @@ jobs:
           dvc pull
           dvc status
 
-      - name: Docker Hub Login (optional push)
-        if: github.event_name == 'push'
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
   deploy:
     needs: [ci]
     runs-on: ubuntu-latest
@@ -40,7 +36,7 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCP_SA_KEY }}"
 
-      - name: Configure GCP Project
+      - name: Set GCP project
         run: gcloud config set project "${{ secrets.GCP_PROJECT_ID }}"
 
       - name: Configure Docker for Artifact Registry
@@ -48,18 +44,13 @@ jobs:
 
       - name: Build & push backend image
         run: |
-          docker buildx create --use
-          docker buildx build . \
-            -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest \
-            -f Dockerfile.backend \
-            --push
+          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest -f Dockerfile.backend .
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest
 
       - name: Build & push frontend image
         run: |
-          docker buildx build . \
-            -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest \
-            -f Dockerfile.frontend \
-            --push
+          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest -f Dockerfile.frontend .
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest
 
       - name: Deploy backend to Cloud Run
         run: |
