@@ -31,7 +31,7 @@ jobs:
           pip install pytest dvc ruff
 
       - name: Run Ruff (linting)
-        run: ruff .
+        run: ruff check .
 
       - name: Run Pytest
         run: pytest
