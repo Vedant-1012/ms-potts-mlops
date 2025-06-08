@@ -170,39 +170,47 @@ jobs:
       - name: ✅ Configure Docker for Artifact Registry
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
+      # ---------- Backend image ------------------------------------------- #
+      - name: 🚀 Set backend image tags
+        id: backend-tags
+        run: |
+          echo "tag=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "latest=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest" >> $GITHUB_OUTPUT
+
       - name: 🚀 Build & push backend image
         run: |
-          BACKEND_IMAGE_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:${{ github.sha }}"
-          BACKEND_IMAGE_LATEST="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest"
-
           docker buildx build \
             --builder "${{ steps.buildx.outputs.name }}" \
             --load \
-            -t "$BACKEND_IMAGE_TAG" \
+            -t "${{ steps.backend-tags.outputs.tag }}" \
             -f Dockerfile.backend .
 
-          docker tag "$BACKEND_IMAGE_TAG" "$BACKEND_IMAGE_LATEST"
-          docker push "$BACKEND_IMAGE_TAG"
-          docker push "$BACKEND_IMAGE_LATEST"
+          docker tag "${{ steps.backend-tags.outputs.tag }}" "${{ steps.backend-tags.outputs.latest }}"
+          docker push "${{ steps.backend-tags.outputs.tag }}"
+          docker push "${{ steps.backend-tags.outputs.latest }}"
 
-          echo "BACKEND_IMAGE=$BACKEND_IMAGE_TAG" >> "$GITHUB_ENV"
+          echo "BACKEND_IMAGE=${{ steps.backend-tags.outputs.tag }}" >> "$GITHUB_ENV"
+
+      # ---------- Frontend image ------------------------------------------ #
+      - name: 🚀 Set frontend image tags
+        id: frontend-tags
+        run: |
+          echo "tag=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "latest=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest" >> $GITHUB_OUTPUT
 
       - name: 🚀 Build & push frontend image
         run: |
-          FRONTEND_IMAGE_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:${{ github.sha }}"
-          FRONTEND_IMAGE_LATEST="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest"
-
           docker buildx build \
             --builder "${{ steps.buildx.outputs.name }}" \
             --load \
-            -t "$FRONTEND_IMAGE_TAG" \
+            -t "${{ steps.frontend-tags.outputs.tag }}" \
             -f Dockerfile.frontend .
 
-          docker tag "$FRONTEND_IMAGE_TAG" "$FRONTEND_IMAGE_LATEST"
-          docker push "$FRONTEND_IMAGE_TAG"
-          docker push "$FRONTEND_IMAGE_LATEST"
+          docker tag "${{ steps.frontend-tags.outputs.tag }}" "${{ steps.frontend-tags.outputs.latest }}"
+          docker push "${{ steps.frontend-tags.outputs.tag }}"
+          docker push "${{ steps.frontend-tags.outputs.latest }}"
 
-          echo "FRONTEND_IMAGE=$FRONTEND_IMAGE_TAG" >> "$GITHUB_ENV"
+          echo "FRONTEND_IMAGE=${{ steps.frontend-tags.outputs.tag }}" >> "$GITHUB_ENV"
 
       # ---------- Cloud Run deploys --------------------------------------- #
       - name: 🌐 Deploy backend to Cloud Run
