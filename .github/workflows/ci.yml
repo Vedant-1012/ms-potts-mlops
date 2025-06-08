@@ -108,17 +108,19 @@ jobs:
       - name: 🌐 Deploy backend to Cloud Run
         run: |
           gcloud run deploy ms-potts-backend \
-            --image "${{ env.BACKEND_TAG_SHA }}" \
+            --image "$BACKEND_IMAGE" \
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \
+            --memory 1Gi \
             --set-env-vars GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
 
       - name: 🌐 Deploy frontend to Cloud Run
         run: |
           gcloud run deploy ms-potts-frontend \
-            --image "${{ env.FRONTEND_TAG_SHA }}" \
+            --image "$FRONTEND_IMAGE" \
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \
+            --memory 1Gi \
             --set-env-vars GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
