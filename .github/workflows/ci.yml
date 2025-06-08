@@ -205,7 +205,7 @@ jobs:
             --region us-central1 \
             --allow-unauthenticated \
             --memory 1Gi \
-            --timeout 600s \
+            --timeout 900s \
             --set-env-vars GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
 
       - name: Fetch backend URL
