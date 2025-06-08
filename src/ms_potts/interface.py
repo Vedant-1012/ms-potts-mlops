@@ -63,7 +63,8 @@ def profile_page(profile, chat):
 def chat_page():
     gr.Markdown("## 💬 Chat with Ms. Potts — Personalized Nutrition Guidance")
 
-    chatbot = gr.Chatbot(type="messages")
+    # use tuple mode so we can keep sending simple (user, bot) pairs
+    chatbot = gr.Chatbot(type="tuple")
     query_input = gr.Textbox(placeholder="Ask about food, diet, meal plans...")
     send_btn = gr.Button("Send")
 
