@@ -19,3 +19,4 @@ typing_extensions
 tqdm
 mlflow
 google-generativeai
+psutil

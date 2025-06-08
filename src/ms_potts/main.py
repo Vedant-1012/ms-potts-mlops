@@ -67,8 +67,8 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from ms_potts.model_gemini import GeminiModel
 from dotenv import load_dotenv
-from utils.monitoring import ModelMonitor
-from utils.enhanced_logging import EnhancedLogger, log_with_context
+from ms_potts.utils.monitoring import ModelMonitor
+from ms_potts.utils.enhanced_logging import EnhancedLogger, log_with_context
 import uuid
 import time
 
