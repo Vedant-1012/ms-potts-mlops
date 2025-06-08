@@ -23,6 +23,31 @@
 # CMD ["uvicorn", "ms_potts.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
 
+# FROM python:3.10-slim
+
+# WORKDIR /app
+
+# ENV PYTHONDONTWRITEBYTECODE=1 \
+#     PYTHONUNBUFFERED=1 \
+#     PYTHONPATH=/app/src:/app
+
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     build-essential \
+#     curl \
+#     git \
+#     && apt-get clean \
+#     && rm -rf /var/lib/apt/lists/*
+
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir --upgrade pip && \
+#     pip install --no-cache-dir -r requirements.txt
+
+# COPY . .
+
+# EXPOSE 8080
+# CMD ["uvicorn", "ms_potts.main:app", "--host", "0.0.0.0", "--port", "8080"]
+
+
 FROM python:3.10-slim
 
 WORKDIR /app
@@ -45,11 +70,24 @@ COPY requirements.txt .
 RUN pip install --upgrade pip \
  && pip install --no-cache-dir -r requirements.txt
 
+RUN pip install --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt
+
+# **Pre-download** the SentenceTransformer model into the cache so it won\'t try at runtime
+RUN python - <<\'PYCODE\'
+from sentence_transformers import SentenceTransformer
+# this will download and cache all weights under /root/.cache/huggingface
+SentenceTransformer(\tence-transformers/all-MiniLM-L6-v2")
+PYCODE
+
 # Copy your code
 COPY . .
 
-# Expose the default port (for documentation)
+# Expose Cloud Run port
 EXPOSE 8080
 
-# Use Cloud Run’s $PORT (default 8080 locally)
+# Launch Uvicorn (use $PORT if set)
 CMD ["sh", "-c", "uvicorn ms_potts.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+
+
+RUN mkdir -p /app/src/ms_potts
