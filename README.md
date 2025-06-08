@@ -2,6 +2,15 @@
 
 Ms. Potts is an AI-powered nutrition chatbot that provides meal recommendations, dietary advice, and meal logging, personalized based on user profile information. This project follows MLOps best practices with comprehensive monitoring, experiment tracking, and configuration management.
 
+## DEMO:
+[GCP APP LINK](https://ms-potts-frontend-1033579299449.us-central1.run.app)
+
+### Step-1 User Profile Creation
+![User Peofile](images/UserProfile.png)
+
+### Step-2 User query for Nutrition Advice
+![Nutrtion Advise Response](images/Response.png)
+
 ## Features
 
 - Retrieval-Augmented Generation (RAG) Pipeline
@@ -221,7 +230,7 @@ docker-compose up --build
 2. Access the frontend at `http://localhost:7860` and the API at `http://localhost:8080`
 
 ## Project Organization
-
+```markdown
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
@@ -284,6 +293,7 @@ docker-compose up --build
     ├── profiling_results <- Code profiling results
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+```
 
 ## MLOps Best Practices
 
