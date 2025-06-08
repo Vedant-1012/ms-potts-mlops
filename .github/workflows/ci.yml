@@ -135,61 +135,57 @@ on:
     branches: [main]
 
 jobs:
-  # --------------------------------------------------------------------------- #
-  # 1️⃣ CI – lint, unit-tests, DVC                                              #
-  # --------------------------------------------------------------------------- #
+  # ------------------------------------------------------------------- #
+  # 1️⃣ CI – Lint, unit-tests, DVC                                      #
+  # ------------------------------------------------------------------- #
   ci:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ✅ Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: ✅ Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: ✅ Install dev dependencies
+      - name: Install dev dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          pip install dvc
+          pip install -r requirements-dev.txt dvc
 
-      - name: ✅ Lint & run tests
+      - name: Lint & run tests
         run: |
           ruff check .
           pytest --cov=src --cov-report=term-missing
 
-      - name: ✅ Pull data with DVC
+      - name: Pull data with DVC
         run: |
           dvc pull
           dvc status
 
-  # --------------------------------------------------------------------------- #
-  # 2️⃣ Deploy – build & push images, deploy to Cloud Run                        #
-  # --------------------------------------------------------------------------- #
+  # ------------------------------------------------------------------- #
+  # 2️⃣ Deploy – build images, push to AR, deploy to Cloud Run           #
+  # ------------------------------------------------------------------- #
   deploy:
     needs: ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
-      - name: ✅ Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: ✅ Authenticate to GCP
+      - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
         with:
           credentials_json: "${{ secrets.GCP_SA_KEY }}"
 
-      - name: ✅ Configure GCP project
+      - name: Configure GCP project
         run: gcloud config set project "${{ secrets.GCP_PROJECT_ID }}"
 
-      - name: ✅ Configure Docker for Artifact Registry
+      - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      - name: 🚀 Build & push backend image
+      - name: Build & push backend image
         run: |
           SHA_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:${{ github.sha }}"
           LATEST_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest"
@@ -201,7 +197,7 @@ jobs:
 
           echo "BACKEND_IMAGE=$SHA_TAG" >> $GITHUB_ENV
 
-      - name: 🌐 Deploy backend to Cloud Run
+      - name: Deploy backend to Cloud Run
         run: |
           gcloud run deploy ms-potts-backend \
             --image "$BACKEND_IMAGE" \
@@ -209,16 +205,16 @@ jobs:
             --region us-central1 \
             --allow-unauthenticated \
             --memory 1Gi \
+            --timeout 300s \
             --set-env-vars GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
 
-      - name: 🔍 Fetch backend URL
+      - name: Fetch backend URL
         run: |
-          URL=$(gcloud run services describe ms-potts-backend \
+          echo "BACKEND_URL=$(gcloud run services describe ms-potts-backend \
             --platform managed --region us-central1 \
-            --format="value(status.url)")
-          echo "BACKEND_URL=$URL" >> $GITHUB_ENV
+            --format='value(status.url)')" >> $GITHUB_ENV
 
-      - name: 🚀 Build & push frontend image
+      - name: Build & push frontend image
         run: |
           SHA_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:${{ github.sha }}"
           LATEST_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest"
@@ -230,7 +226,7 @@ jobs:
 
           echo "FRONTEND_IMAGE=$SHA_TAG" >> $GITHUB_ENV
 
-      - name: 🌐 Deploy frontend to Cloud Run
+      - name: Deploy frontend to Cloud Run
         run: |
           gcloud run deploy ms-potts-frontend \
             --image "$FRONTEND_IMAGE" \
@@ -238,4 +234,5 @@ jobs:
             --region us-central1 \
             --allow-unauthenticated \
             --memory 1Gi \
-            --set-env-vars "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},BACKEND_URL=${{ env.BACKEND_URL }}"
+            --timeout 300s \
+            --set-env-vars GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}",BACKEND_URL="${{ env.BACKEND_URL }}"
