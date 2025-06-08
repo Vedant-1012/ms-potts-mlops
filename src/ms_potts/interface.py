@@ -1,18 +1,16 @@
+import os
 import gradio as gr
 import requests
-import os
 import google.generativeai as genai
 
 # configure Gemini
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # read backend URL from environment (set this in Cloud Run)
-BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:8080")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:8080").rstrip("/")
 
 # Global profile storage
 user_profile = {}
-
-# ------------------- Gradio App -------------------
 
 
 def profile_page(profile, chat):
@@ -50,7 +48,6 @@ def profile_page(profile, chat):
             "allergies": allergies,
         }
         status_text = f"✅ Welcome {name}! Profile saved. You can start chatting now."
-        # hide profile form, show chat box
         return gr.update(visible=False), gr.update(visible=True), status_text
 
     save_btn.click(
@@ -63,8 +60,8 @@ def profile_page(profile, chat):
 def chat_page():
     gr.Markdown("## 💬 Chat with Ms. Potts — Personalized Nutrition Guidance")
 
-    # use tuple mode so we can keep sending simple (user, bot) pairs
-    chatbot = gr.Chatbot(type="tuple")
+    # switched to the correct plural form
+    chatbot = gr.Chatbot(type="tuples")
     query_input = gr.Textbox(placeholder="Ask about food, diet, meal plans...")
     send_btn = gr.Button("Send")
 
@@ -72,22 +69,21 @@ def chat_page():
         payload = {"query": query, "context": {"user_profile": user_profile}}
         try:
             resp = requests.post(f"{BACKEND_URL}/query", json=payload)
+            resp.raise_for_status()
             data = resp.json()
 
             final_answer = data.get("final_answer", "No answer received.")
             intent = data.get("detected_intent", "Unknown Intent")
             reasoning = data.get("reasoning", "")
 
-            user_name = user_profile.get("name", "")
-            if final_answer.strip().lower().startswith(("hi", "hello")):
-                personalized = final_answer
-            else:
-                personalized = f"Hi {user_name}, {final_answer}"
+            name = user_profile.get("name", "")
+            if not final_answer.lower().startswith(("hi", "hello")) and name:
+                final_answer = f"Hi {name}, {final_answer}"
 
             history.append(
                 (
                     query,
-                    personalized + f"\n\n📌 Intent: {intent}\n🧠 Reasoning: {reasoning}",
+                    final_answer + f"\n\n📌 Intent: {intent}\n🧠 Reasoning: {reasoning}",
                 )
             )
             return history, ""
@@ -103,16 +99,14 @@ def chat_page():
     )
 
 
-# Build Gradio App
+# Build the app
 with gr.Blocks() as gradio_app:
     with gr.Column(visible=True) as profile:
         pass
-
     with gr.Column(visible=False) as chat:
         chat_page()
-
     profile_page(profile, chat)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 7860))
+    port = int(os.environ.get("PORT", 8080))
     gradio_app.launch(server_name="0.0.0.0", server_port=port)
