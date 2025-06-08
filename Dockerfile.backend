@@ -47,17 +47,14 @@
 # EXPOSE 8080
 # CMD ["uvicorn", "ms_potts.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
-
 FROM python:3.10-slim
 
 WORKDIR /app
 
-# Don’t create .pyc files, and send logs straight to stdout
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app/src:/app
 
-# Install system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
@@ -65,19 +62,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps
 COPY requirements.txt .
 RUN pip install --upgrade pip \
  && pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --upgrade pip \
- && pip install --no-cache-dir -r requirements.txt
+# Create directory for source code
+RUN mkdir -p /app/src/ms_potts
 
-# **Pre-download** the SentenceTransformer model into the cache so it won\'t try at runtime
+# Pre-download the SentenceTransformer model into the cache
 RUN python - <<\'PYCODE\'
 from sentence_transformers import SentenceTransformer
 # this will download and cache all weights under /root/.cache/huggingface
-SentenceTransformer(\tence-transformers/all-MiniLM-L6-v2")
+SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 PYCODE
 
 # Copy your code
@@ -88,6 +84,3 @@ EXPOSE 8080
 
 # Launch Uvicorn (use $PORT if set)
 CMD ["sh", "-c", "uvicorn ms_potts.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
-
-
-RUN mkdir -p /app/src/ms_potts
