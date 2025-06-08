@@ -110,11 +110,12 @@ on:
     branches: [main]
 
 jobs:
-  # --------------------------------------------------------------------------- #
-  # 1️⃣  CI JOB – lint, unit-tests, DVC                                           #
-  # --------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
+# 1️⃣  CI JOB – lint, unit-tests, DVC                                           #
+# --------------------------------------------------------------------------- #
   ci:
     runs-on: ubuntu-latest
+
     steps:
       - name: ✅ Checkout repository
         uses: actions/checkout@v4
@@ -140,9 +141,9 @@ jobs:
           dvc pull
           dvc status
 
-  # --------------------------------------------------------------------------- #
-  # 2️⃣  DEPLOY JOB – build & push images, deploy to Cloud Run                  #
-  # --------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
+# 2️⃣  DEPLOY JOB – build & push images, deploy to Cloud Run                  #
+# --------------------------------------------------------------------------- #
   deploy:
     needs: ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -152,47 +153,59 @@ jobs:
       - name: ✅ Checkout repository
         uses: actions/checkout@v4
 
+      # ---------- Authenticate to Google Cloud ----------------------------- #
       - name: ✅ Authenticate to GCP
         uses: google-github-actions/auth@v2
         with:
           credentials_json: "${{ secrets.GCP_SA_KEY }}"
 
-      - name: ✅ Configure GCP project
+      - name: ✅ Set GCP project
         run: gcloud config set project "${{ secrets.GCP_PROJECT_ID }}"
+
+      # ---------- Docker Buildx & Artifact Registry ------------------------ #
+      - name: 🛠️ Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: ✅ Configure Docker for Artifact Registry
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      # ---------- Build & push backend image --------------------------------- #
-      - name: 🚀 Build & push backend image
+      # ---------- Login to Google Artifact Registry ------------------------ #
+      - name: 🔑 Login to Google Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GCP_SA_KEY }}
+
+      # ---------- Backend image ------------------------------------------- #
+      - name: 🚀 Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.backend
+          push: true
+          tags: |
+            us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:${{ github.sha }}
+            us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest
+
+      # ---------- Frontend image ------------------------------------------ #
+      - name: 🚀 Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.frontend
+          push: true
+          tags: |
+            us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:${{ github.sha }}
+            us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest
+
+      # ---------- Set environment variables for deployment ----------------- #
+      - name: 🔧 Set environment variables for deployment
         run: |
-          # define both a SHA tag and a `latest` tag
-          BACKEND_SHA_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:${{ github.sha }}"
-          BACKEND_LATEST="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:latest"
+          echo "BACKEND_IMAGE=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:${{ github.sha }}" >> $GITHUB_ENV
 
-          # build, tag, push
-          docker build -t "$BACKEND_SHA_TAG" -f Dockerfile.backend .
-          docker tag "$BACKEND_SHA_TAG" "$BACKEND_LATEST"
-          docker push "$BACKEND_SHA_TAG"
-          docker push "$BACKEND_LATEST"
-
-          # make the SHA tag available for the deploy step
-          echo "BACKEND_IMAGE=$BACKEND_SHA_TAG" >> $GITHUB_ENV
-
-      # ---------- Build & push frontend image --------------------------------#
-      - name: 🚀 Build & push frontend image
-        run: |
-          FRONTEND_SHA_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:${{ github.sha }}"
-          FRONTEND_LATEST="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:latest"
-
-          docker build -t "$FRONTEND_SHA_TAG" -f Dockerfile.frontend .
-          docker tag "$FRONTEND_SHA_TAG" "$FRONTEND_LATEST"
-          docker push "$FRONTEND_SHA_TAG"
-          docker push "$FRONTEND_LATEST"
-
-          echo "FRONTEND_IMAGE=$FRONTEND_SHA_TAG" >> $GITHUB_ENV
-
-      # ---------- Deploy to Cloud Run --------------------------------------- #
+      # ---------- Cloud Run deploys --------------------------------------- #
       - name: 🌐 Deploy backend to Cloud Run
         run: |
           gcloud run deploy ms-potts-backend \
