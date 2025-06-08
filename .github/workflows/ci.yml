@@ -170,7 +170,6 @@ jobs:
       - name: ✅ Configure Docker for Artifact Registry
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      # ---------- Backend image ------------------------------------------- #
       - name: 🚀 Build & push backend image
         run: |
           BACKEND_IMAGE_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/backend:${{ github.sha }}"
@@ -188,7 +187,6 @@ jobs:
 
           echo "BACKEND_IMAGE=$BACKEND_IMAGE_TAG" >> "$GITHUB_ENV"
 
-      # ---------- Frontend image ------------------------------------------ #
       - name: 🚀 Build & push frontend image
         run: |
           FRONTEND_IMAGE_TAG="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dietitian-chatbot-nli/frontend:${{ github.sha }}"
