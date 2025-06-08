@@ -66,11 +66,8 @@ COPY requirements.txt .
 RUN pip install --upgrade pip \
  && pip install --no-cache-dir -r requirements.txt
 
-# Create directory for source code
-RUN mkdir -p /app/src/ms_potts
-
 # Pre-download the SentenceTransformer model into the cache
-RUN python - <<\'PYCODE\'
+RUN python - <<\"PYCODE\"
 from sentence_transformers import SentenceTransformer
 # this will download and cache all weights under /root/.cache/huggingface
 SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
