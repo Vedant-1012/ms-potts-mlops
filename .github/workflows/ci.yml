@@ -204,7 +204,7 @@ jobs:
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \
-            --memory 1Gi \
+            --memory 2Gi \
             --timeout 900s \
             --set-env-vars GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
 
