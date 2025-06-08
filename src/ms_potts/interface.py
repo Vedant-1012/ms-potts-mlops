@@ -59,7 +59,7 @@ def profile_page(profile, chat):
 def chat_page():
     gr.Markdown("## 💬 Chat with Ms. Potts — Personalized Nutrition Guidance")
 
-    chatbot = gr.Chatbot()
+    chatbot = gr.Chatbot(type="messages")
     query_input = gr.Textbox(placeholder="Ask about food, diet, meal plans...")
     send_btn = gr.Button("Send")
 
@@ -111,6 +111,8 @@ with gr.Blocks() as gradio_app:
 
     profile_page(profile, chat)
 
-# Launch Gradio App
 if __name__ == "__main__":
-    gradio_app.launch(server_name="0.0.0.0", server_port=8080)
+    import os
+
+    port = int(os.environ.get("PORT", 7860))
+    gradio_app.launch(server_name="0.0.0.0", server_port=port)

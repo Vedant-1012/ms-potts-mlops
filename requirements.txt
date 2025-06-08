@@ -20,3 +20,4 @@ tqdm
 mlflow
 google-generativeai
 psutil
+gradio
