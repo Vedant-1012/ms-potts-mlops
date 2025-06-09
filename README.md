@@ -1,4 +1,19 @@
-# Ms. Potts - AI-powered Nutrition Assistant 🥗
+# Ms. Potts - AI-powered Nutrition Assistant
+
+---
+
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Made with FastAPI](https://img.shields.io/badge/Made%20with-FastAPI-009688.svg)
+![Gemini API](https://img.shields.io/badge/Gemini-API-blueviolet)
+![Gradio UI](https://img.shields.io/badge/Gradio-frontend-orange)
+![Dockerized](https://img.shields.io/badge/docker-containerized-blue)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-purple)
+![Linted with Ruff](https://img.shields.io/badge/linting-ruff-yellow)
+![Pre-commit Hooks](https://img.shields.io/badge/pre--commit-enabled-success)
+![MLflow Tracking](https://img.shields.io/badge/experiment--tracking-mlflow-orange)
+![GCP Cloud Run](https://img.shields.io/badge/deployed%20to-Google%20Cloud%20Run-green)
 
 Ms. Potts is an AI-powered nutrition chatbot that provides meal recommendations, dietary advice, and meal logging, personalized based on user profile information. This project follows MLOps best practices with comprehensive monitoring, experiment tracking, and configuration management.
 
