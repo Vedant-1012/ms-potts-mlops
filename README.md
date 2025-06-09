@@ -321,6 +321,13 @@ This project follows these MLOps best practices:
 5. **Experiment Tracking**: MLflow for tracking parameters, metrics, and artifacts
 6. **Enhanced Logging**: Rich, structured logging with context
 7. **Configuration Management**: Hydra for hierarchical configuration
+8. 
+
+## Team
+
+- [Vedant Thakkar](https://github.com/Vedant-1012)
+- [Shilpa Musale](https://github.com/shilpamusale) 
+
 
 ## License
 
